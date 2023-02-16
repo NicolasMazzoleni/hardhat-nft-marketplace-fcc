@@ -126,12 +126,26 @@ contract NftMarketplace is ReentrancyGuard, Ownable {
 
         // emit the event
         emit ItemCancelled(contractCallerAddress, nftContractAddress, nftTokenId);
+    }
 
+    function updateListing(address nftContractAddress, uint256 nftTokenId, uint256 newPrice) external onlyOwner {
+        address contractCallerAddress = msg.sender;
+        
+        Listing memory listing = s_listing[nftContractAddress][nftTokenId];
+            if (listing.price <= 0) {
+                revert NftMarketplace__NftNotListed();
+            }
+
+        // update the price of an NFT
+        s_listing[nftContractAddress][nftTokenId].price = newPrice;
+
+        // emit the event
+        emit ItemListed(contractCallerAddress, nftContractAddress, nftTokenId, newPrice);
     }
 }
 
 //     1. ListItem : List NFT on the marketplace ✅
 //     2. BuyItem : Buy the NFTs ✅
 //     3. CancelItem : Cancel a listing ✅
-//     4. UpdateListing : Update the price of an NFT
+//     4. UpdateListing : Update the price of an NFT ✅
 //     5. WithdrawProceeds : Withdraw payment for my bought NFTs

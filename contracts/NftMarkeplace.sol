@@ -11,6 +11,8 @@ error NftMarketplace__NftAlreadyListed();
 error NftMarketplace__NftNotListed();
 // error NftMarketplace__NotOwner();
 error NftMarketPlace__PayableAmountTooLow(address nftContractAddress, uint256 nftTokenId, uint256 payableAmount);
+error NftMarketplace__NoCaller();
+error NftMarketplace__withdrawFailed();
 
 contract NftMarketplace is ReentrancyGuard, Ownable {
     // Creating a custom type
@@ -142,10 +144,31 @@ contract NftMarketplace is ReentrancyGuard, Ownable {
         // emit the event
         emit ItemListed(contractCallerAddress, nftContractAddress, nftTokenId, newPrice);
     }
+
+    function withdrawContractCaller() external {
+        address contractCallerAddress = msg.sender;
+
+        uint256 amount = s_callerEarnedAmount[contractCallerAddress];
+        if (amount <= 0) {
+            revert NftMarketplace__NoCaller();
+        }
+
+        // Reset the caller to zero
+        s_callerEarnedAmount[contractCallerAddress] = 0;
+
+        // send payments
+        (bool success, ) = payable(contractCallerAddress).call{value: amount}(");
+
+        if (!success) {
+            revert NftMarketplace__withdrawFailed();
+        }
+
+
+    }
 }
 
 //     1. ListItem : List NFT on the marketplace ✅
 //     2. BuyItem : Buy the NFTs ✅
 //     3. CancelItem : Cancel a listing ✅
 //     4. UpdateListing : Update the price of an NFT ✅
-//     5. WithdrawProceeds : Withdraw payment for my bought NFTs
+//     5. WithdrawProceeds : Withdraw payment for my bought NFTs ✅

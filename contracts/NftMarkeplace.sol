@@ -157,13 +157,20 @@ contract NftMarketplace is ReentrancyGuard, Ownable {
         s_callerEarnedAmount[contractCallerAddress] = 0;
 
         // send payments
-        (bool success, ) = payable(contractCallerAddress).call{value: amount}(");
+        (bool success, ) = payable(contractCallerAddress).call{value: amount}("");
 
         if (!success) {
             revert NftMarketplace__withdrawFailed();
         }
+    }
 
+    // Getter Functions
+    function getListing(address nftContractAddress, uint256 nftTokenId) external view returns (Listing memory) {
+        return s_listing[nftContractAddress][nftTokenId];
+    }
 
+    function getCallerEarnedAmount(address contractCallerAddress) external view returns (uint256) {
+        return  s_callerEarnedAmount[contractCallerAddress];
     }
 }
 

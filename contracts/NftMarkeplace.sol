@@ -72,13 +72,13 @@ contract NftMarketplace is ReentrancyGuard, Ownable {
             revert NftMarketplace__NotApprovedForMarketplace();
         }
 
-        s_listing[nftContractAddress][NftTokenId] = Listing(price, contractCallerAddress);
-        emit ItemListed(contractCallerAddress, nftContractAddress, NftTokenId, price);
-
         Listing memory listing = s_listing[nftContractAddress][NftTokenId];
         if (listing.price > 0) {
             revert NftMarketplace__NftAlreadyListed();
         }
+
+        s_listing[nftContractAddress][NftTokenId] = Listing(price, contractCallerAddress);
+        emit ItemListed(contractCallerAddress, nftContractAddress, NftTokenId, price);
 
         // address owner = nft.ownerOf(NftTokenId);
         // if (contractCallerAddress != owner) {
